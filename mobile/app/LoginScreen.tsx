@@ -1,23 +1,24 @@
-import React from 'react';
-import { View, Button, Text } from 'react-native';
-import { useGoogleSignIn } from '../src/utils/authHelpers';
-import { useAuth } from '../src/context/AuthContext';
+import React from "react";
+import { View, Text, Button } from "react-native";
+import { router } from "expo-router";
 
 export default function LoginScreen() {
-  const { request, promptAsync } = useGoogleSignIn();
-  const { user } = useAuth();
+  const handleLogin = () => {
+    // For now, just go to tabs after "login"
+    router.replace("/(tabs)");
+  };
 
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      {user ? (
-        <Text>Welcome, {user.displayName}</Text>
-      ) : (
-        <Button
-          title="Sign in with Google"
-          disabled={!request}
-          onPress={() => promptAsync()}
-        />
-      )}
+    <View
+      style={{
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "#fff",
+      }}
+    >
+      <Text style={{ fontSize: 20, marginBottom: 20 }}>Login Screen</Text>
+      <Button title="Continue to App" onPress={handleLogin} />
     </View>
   );
 }
