@@ -1,6 +1,6 @@
 // src/services/auth.ts
 import { signInAnonymously } from "firebase/auth";
-import { auth } from "../firebaseConfig";
+import { auth } from "../lib/firebaseConfig";
 
 export async function signInAnon() {
   try {

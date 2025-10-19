@@ -1,22 +1,13 @@
+import React from "react";
 import { View, Text, Button } from "react-native";
 import { router } from "expo-router";
-import React from "react";
 
-export default function HomeScreen() {
+export default function HomeTab() {
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        gap: 20,
-      }}
-    >
-      <Text style={{ fontSize: 22 }}>Home Tab Screen</Text>
-      <Button
-        title="Join a Session"
-        onPress={() => router.push("/joinSession")}
-      />
+    <View style={{ flex: 1, gap: 16, justifyContent: "center", alignItems: "center" }}>
+      <Text style={{ fontSize: 22, fontWeight: "600" }}>ForkYes</Text>
+      <Button title="Create a Session" onPress={() => router.push("/createSession")} />
+      <Button title="Join a Session" onPress={() => router.push("/joinSession")} />
     </View>
   );
 }

@@ -8,7 +8,7 @@ export default function RootLayout() {
     // Wait until navigation is ready before redirecting
     const timeout = setTimeout(() => {
       if (navigationRef.isReady()) {
-        router.replace("/(tabs)");
+        router.replace("/joinSession");
       }
     }, 100);
 

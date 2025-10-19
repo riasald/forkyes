@@ -1,66 +1,41 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Button, StyleSheet, Alert } from "react-native";
+import { View, Text, TextInput, Button, Alert } from "react-native";
+import { useAnonymousAuth } from "../src/utils/authHelpers";
+import { joinSession } from "../src/utils/session";
 import { router } from "expo-router";
 
 export default function JoinSessionScreen() {
-  const [sessionCode, setSessionCode] = useState("");
+  const { ready } = useAnonymousAuth();
   const [name, setName] = useState("");
+  const [code, setCode] = useState("");
 
-  const handleJoin = () => {
-    if (!sessionCode || !name) {
-      Alert.alert("Missing info", "Please enter both name and session code.");
-      return;
+  const onJoin = async () => {
+    try {
+      if (!ready) return;
+      const normalized = await joinSession(code, name);
+      router.replace({ pathname: "/sessionLobby", params: { code: normalized } });
+    } catch (e: any) {
+      Alert.alert("Join failed", e.message ?? String(e));
     }
-
-    // In the future, you can validate with Firebase here
-    console.log("Joining session:", sessionCode, "as", name);
-    router.replace("/(tabs)"); // Navigate to main app after joining
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Join a Session</Text>
-
+    <View style={{ flex: 1, padding: 24, gap: 12, justifyContent: "center" }}>
+      <Text style={{ fontSize: 22, fontWeight: "600" }}>Join a Session</Text>
       <TextInput
-        style={styles.input}
-        placeholder="Enter your name"
+        placeholder="Your name"
         value={name}
         onChangeText={setName}
+        style={{ borderWidth: 1, borderColor: "#ccc", borderRadius: 8, padding: 12 }}
       />
-
       <TextInput
-        style={styles.input}
-        placeholder="Enter session code"
-        value={sessionCode}
-        onChangeText={setSessionCode}
+        placeholder="Session code (e.g. ABC123)"
+        value={code}
         autoCapitalize="characters"
+        onChangeText={setCode}
+        style={{ borderWidth: 1, borderColor: "#ccc", borderRadius: 8, padding: 12 }}
       />
-
-      <Button title="Join Session" onPress={handleJoin} />
+      <Button title="Join" onPress={onJoin} />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 24,
-    backgroundColor: "#fff",
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "600",
-    marginBottom: 24,
-  },
-  input: {
-    width: "100%",
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 16,
-    fontSize: 16,
-  },
-});
