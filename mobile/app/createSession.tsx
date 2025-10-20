@@ -28,6 +28,7 @@ export default function CreateSessionScreen() {
         style={{ borderWidth: 1, borderColor: "#ccc", borderRadius: 8, padding: 12 }}
       />
       <Button title="Create" onPress={onCreate} />
+      <Button title="Back" onPress={() => router.push('/')} />
     </View>
   );
 }

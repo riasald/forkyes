@@ -27,6 +27,7 @@ export default function SessionLobbyScreen() {
       />
 
       <Button title="Start swiping (placeholder)" onPress={() => router.replace("/(tabs)")} />
+      <Button title="Back" onPress={() => router.push('/')} />
     </View>
   );
 }
