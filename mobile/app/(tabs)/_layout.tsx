@@ -17,6 +17,12 @@ export default function TabLayout() {
           title: "Explore",
         }}
       />
+      <Tabs.Screen
+          name="matchScreen"
+          options={{
+            title: "Matches",
+          }}
+      />
     </Tabs>
   );
 }

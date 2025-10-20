@@ -1,10 +1,3 @@
-import React from 'react';
-import { Stack, useLocalSearchParams } from 'expo-router';
-import { Text } from 'react-native'; // <-- Added Text import
-
-// --- VERIFY THIS PATH AND FILENAME CASE ---
-// Assuming filenames in src/screens/ are PascalCase
-import SwipeScreenComponent from '@/src/screens/SwipeScreen'; // <-- Corrected case
 
 // Mock data or fetch logic
 const MOCK_RESTAURANTS = [
