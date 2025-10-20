@@ -26,7 +26,20 @@ export default function SessionLobbyScreen() {
         ListEmptyComponent={<Text>Waiting for friends to join…</Text>}
       />
 
-      <Button title="Start swiping (placeholder)" onPress={() => router.replace("/(tabs)")} />
+      <Button
+        title="Start swiping"
+        onPress={() => {
+          if (!code) {
+            console.warn("⚠️ No session code to pass!");
+            return;
+          }
+          console.log("➡️ Navigating to index with code:", code);
+          router.replace({
+            pathname: "../(tabs)", // 👈 adjust to your actual route
+            params: { code },
+          });
+        }}
+      />
     </View>
   );
 }
