@@ -81,3 +81,22 @@ export function subscribeParticipants(code: string, cb: (list: { uid: string; na
 
   return () => off(participantsRef, "value", handler);
 }
+
+/** Record a swipe (like or dislike) for a restaurant */
+export async function recordSwipe(sessionCode: string, restaurantId: string, liked: boolean) {
+  const db = getDatabase();
+  const user = auth.currentUser;
+  if (!user) throw new Error("Must be signed in");
+
+  const swipeRef = ref(db, `sessions/${sessionCode}/swipes/${user.uid}/${restaurantId}`);
+  await set(swipeRef, liked ? "like" : "dislike");
+}
+
+/** Listen for all swipes in this session */
+export function subscribeSwipes(sessionCode: string, callback: (swipes: any) => void) {
+  const db = getDatabase();
+  const swipesRef = ref(db, `sessions/${sessionCode}/swipes`);
+  onValue(swipesRef, (snap) => {
+    callback(snap.val() || {});
+  });
+}
