@@ -12,16 +12,10 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="matches"
         options={{
-          title: "Explore",
+          title: "Matches",
         }}
-      />
-      <Tabs.Screen
-          name="matchScreen"
-          options={{
-            title: "Matches",
-          }}
       />
     </Tabs>
   );

@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text } from "react-native";
 
-export default function ExploreScreen() {
+export default function MatchScreen() {
   return (
     <View
       style={{
@@ -10,7 +10,7 @@ export default function ExploreScreen() {
         alignItems: "center",
       }}
     >
-      <Text style={{ fontSize: 22 }}>Explore Tab Screen</Text>
+      <Text style={{ fontSize: 22 }}>No Matches At the Moment!</Text>
     </View>
   );
 }

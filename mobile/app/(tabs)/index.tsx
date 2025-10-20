@@ -3,15 +3,18 @@ import React, { useEffect, useState, useCallback } from "react";
 import {
   View,
   Text,
-  FlatList,
   ActivityIndicator,
-  RefreshControl,
   Image,
-  TouchableOpacity,
-  Dimensions
+  Dimensions,
+  StyleSheet, // Import StyleSheet
+  Button, // Import Button
 } from "react-native";
-import { useLocalSearchParams } from "expo-router";
-import { subscribeRestaurants, seedRestaurantsForSession } from "../../src/utils/session";
+import { useLocalSearchParams, router } from "expo-router"; // Import router
+import Swiper from "react-native-deck-swiper"; // Import the swiper
+import {
+  subscribeRestaurants,
+  seedRestaurantsForSession,
+} from "../../src/utils/session";
 
 type Row = { name: string; address: string; photoUrl?: string };
 
@@ -21,11 +24,13 @@ export default function HomeTab() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [allSwiped, setAllSwiped] = useState(false); // State for when stack is empty
 
   useEffect(() => {
     if (!code) return;
     const unsub = subscribeRestaurants(code, (list: Row[]) => {
       setRows(list);
+      setAllSwiped(false); // Reset swiped state when new cards load
       setLoading(false);
     });
     return unsub;
@@ -60,8 +65,11 @@ export default function HomeTab() {
     return (
       <Centered>
         <Text style={{ fontSize: 16, color: "#444", textAlign: "center" }}>
-          Missing session code. Fart here with {"{ code }"} after createSession().
+          Missing session code.
         </Text>
+        <View style={{ marginTop: 20 }}>
+          <Button title="Back to Home" onPress={() => router.push("/")} />
+        </View>
       </Centered>
     );
   }
@@ -70,7 +78,29 @@ export default function HomeTab() {
     return (
       <Centered>
         <ActivityIndicator />
-        <Text style={{ marginTop: 8, color: "#666" }}>Finding nearby restaurants…</Text>
+        <Text style={{ marginTop: 8, color: "#666" }}>
+          Finding nearby restaurants…
+        </Text>
+      </Centered>
+    );
+  }
+
+  if ((rows.length === 0 || allSwiped) && !loading) {
+    return (
+      <Centered>
+        <Text style={{ fontSize: 18, color: "#555", textAlign: "center" }}>
+          {allSwiped
+            ? "You've seen all the restaurants!"
+            : "No restaurants found."}
+        </Text>
+        <Text style={{ color: "#888", textAlign: "center", marginVertical: 16 }}>
+          Try expanding your search radius or refresh.
+        </Text>
+        <Button
+          title={refreshing ? "Refreshing..." : "Refresh Now"}
+          onPress={onRefresh}
+          disabled={refreshing}
+        />
       </Centered>
     );
   }
@@ -78,73 +108,141 @@ export default function HomeTab() {
   return (
     <View style={{ flex: 1, backgroundColor: "#fafafa" }}>
       {error ? (
-        <Text style={{ color: "red", padding: 12, textAlign: "center" }}>{error}</Text>
+        <Text style={{ color: "red", padding: 12, textAlign: "center" }}>
+          {error}
+        </Text>
       ) : null}
 
-      <FlatList
-        data={rows}
-        keyExtractor={(item, i) => (item.name ?? "row") + i}
-        numColumns={1}
-        contentContainerStyle={{ padding: 16, gap: 14 }}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-        renderItem={({ item }) => <RestaurantCard item={item} />}
-        ListEmptyComponent={
-          <Centered>
-            <Text style={{ color: "#666" }}>No restaurants found in this area.</Text>
-          </Centered>
-        }
+      <Swiper
+        cards={rows}
+        renderCard={(card: Row) => <RestaurantCard item={card} />}
+        onSwipedLeft={(cardIndex) => {
+          console.log("Swiped LEFT on:", rows[cardIndex].name);
+        }}
+        onSwipedRight={(cardIndex) => {
+          console.log("Swiped RIGHT on:", rows[cardIndex].name);
+        }}
+        onSwipedAll={() => {
+          console.log("onSwipedAll");
+          setAllSwiped(true);
+        }}
+        cardIndex={0}
+        backgroundColor={"transparent"}
+        stackSize={3} // Show 3 cards in the stack
+        stackSeparation={15} // How much the cards below peek out
+        verticalSwipe={false} // Disable swiping up/down
+        animateOverlayLabelsOpacity
+        overlayLabels={{
+          left: {
+            title: "FORK NO",
+            style: {
+              label: styles.overlayLabel,
+              wrapper: styles.overlayWrapperLeft,
+            },
+          },
+          right: {
+            title: "FORK YES",
+            style: {
+              label: styles.overlayLabel,
+              wrapper: styles.overlayWrapperRight,
+            },
+          },
+        }}
       />
     </View>
   );
 }
 
-function RestaurantCard({
-  item,
-  onPress,
-}: {
-  item: Row;
-  onPress?: () => void;
-}) {
+function RestaurantCard({ item }: { item: Row }) {
   const src = item.photoUrl
     ? { uri: item.photoUrl }
-    : { uri: `https://picsum.photos/seed/${encodeURIComponent(item.name)}/1200/800` };
+    : {
+        uri: `https://picsum.photos/seed/${encodeURIComponent(item.name)}/1200/800`,
+      };
 
-const { width, height } = Dimensions.get("window");
+  const { width, height } = Dimensions.get("window");
   return (
-    <TouchableOpacity
-      onPress={onPress}
-      activeOpacity={0.8}
+    <View
       style={{
-        width: width - 32,
-        height: height / 3,
+        width: width - 48, // A bit more horizontal margin
+        height: height * 0.65, // Taller card
         backgroundColor: "#fff",
         borderRadius: 14,
         overflow: "hidden",
         shadowColor: "#000",
-        shadowOpacity: 0.06,
-        shadowRadius: 8,
-        shadowOffset: { width: 0, height: 4 },
-        elevation: 2,
+        shadowOpacity: 0.1,
+        shadowRadius: 10,
+        shadowOffset: { width: 0, height: 5 },
+        elevation: 5,
       }}
     >
-      <Image source={src} resizeMode="cover" style={{ width: "100%", height: "70%" }} />
-      <View style={{ padding: 10 }}>
-        <Text numberOfLines={1} style={{ fontWeight: "700", fontSize: 16, color: "#222" }}>
+      <Image
+        source={src}
+        resizeMode="cover"
+        style={{ width: "100%", height: "70%" }}
+      />
+      <View style={{ padding: 14, flex: 1 }}>
+        <Text
+          numberOfLines={1}
+          style={{ fontWeight: "700", fontSize: 18, color: "#222" }}
+        >
           {item.name}
         </Text>
-        <Text numberOfLines={2} style={{ color: "#666", marginTop: 2 }}>
+        <Text numberOfLines={2} style={{ color: "#666", marginTop: 4 }}>
           {item.address}
         </Text>
       </View>
-    </TouchableOpacity>
+    </View>
   );
 }
 
 function Centered({ children }: { children: React.ReactNode }) {
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center", padding: 24 }}>
+    <View
+      style={{
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        padding: 24,
+        backgroundColor: "#fafafa",
+      }}
+    >
       {children}
     </View>
   );
-<Button title="Back" onPress={() => router.push('/')} />
 }
+
+// --- Add StyleSheet for overlay labels ---
+const styles = StyleSheet.create({
+  overlayLabel: {
+    fontSize: 45,
+    fontWeight: "bold",
+    color: "white",
+    padding: 10,
+    textShadowColor: "rgba(0, 0, 0, 0.75)",
+    textShadowOffset: { width: -1, height: 1 },
+    textShadowRadius: 10,
+  },
+  overlayWrapperLeft: {
+    flexDirection: "column",
+    alignItems: "flex-end",
+    justifyContent: "flex-start",
+    marginTop: 30,
+    marginLeft: -30,
+    transform: [{ rotate: "15deg" }],
+    borderColor: "red",
+    borderWidth: 4,
+    borderRadius: 10,
+  },
+  overlayWrapperRight: {
+    flexDirection: "column",
+    alignItems: "flex-start",
+    justifyContent: "flex-start",
+    marginTop: 30,
+    marginLeft: 30,
+    transform: [{ rotate: "-15deg" }],
+    borderColor: "green",
+    borderWidth: 4,
+    borderRadius: 10,
+  },
+});
