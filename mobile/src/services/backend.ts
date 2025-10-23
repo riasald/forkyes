@@ -25,6 +25,7 @@ export async function fetchRestaurantsByRadius(
       })) ?? [];
 
     console.log("✅ Parsed restaurants:", restaurants.length);
+
     return restaurants;
   } catch (err) {
     console.error("❌ Error fetching Geoapify data:", err);

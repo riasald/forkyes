@@ -15,6 +15,8 @@ import {
   subscribeRestaurants,
   seedRestaurantsForSession,
 } from "../../src/utils/session";
+import { getRestaurantImageByName } from "../../assets/restaurantImages";
+
 
 type Row = { name: string; address: string; photoUrl?: string };
 
@@ -154,18 +156,20 @@ export default function HomeTab() {
 }
 
 function RestaurantCard({ item }: { item: Row }) {
-  const src = item.photoUrl
+  const localImg = getRestaurantImageByName(item.name);
+
+  const src = localImg
+    ? localImg
+    : item.photoUrl
     ? { uri: item.photoUrl }
-    : {
-        uri: `https://picsum.photos/seed/${encodeURIComponent(item.name)}/1200/800`,
-      };
+    : { uri: `https://picsum.photos/seed/${encodeURIComponent(item.name)}/1200/800` };
 
   const { width, height } = Dimensions.get("window");
   return (
     <View
       style={{
-        width: width - 48, // A bit more horizontal margin
-        height: height * 0.65, // Taller card
+        width: width - 48,
+        height: height * 0.65,
         backgroundColor: "#fff",
         borderRadius: 14,
         overflow: "hidden",
@@ -176,16 +180,9 @@ function RestaurantCard({ item }: { item: Row }) {
         elevation: 5,
       }}
     >
-      <Image
-        source={src}
-        resizeMode="cover"
-        style={{ width: "100%", height: "70%" }}
-      />
+      <Image source={src} resizeMode="cover" style={{ width: "100%", height: "70%" }} />
       <View style={{ padding: 14, flex: 1 }}>
-        <Text
-          numberOfLines={1}
-          style={{ fontWeight: "700", fontSize: 18, color: "#222" }}
-        >
+        <Text numberOfLines={1} style={{ fontWeight: "700", fontSize: 18, color: "#222" }}>
           {item.name}
         </Text>
         <Text numberOfLines={2} style={{ color: "#666", marginTop: 4 }}>
