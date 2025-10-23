@@ -81,8 +81,8 @@ export default function SwipeScreenComponent({ sessionCode, restaurants }: Props
         stackSize={3}
         stackSeparation={15} // Added for better visual separation
         overlayLabels={{
-          left: { title: 'NOPE', style: { label: styles.overlayLabel, wrapper: styles.overlayWrapperLeft } },
-          right: { title: 'LIKE', style: { label: styles.overlayLabel, wrapper: styles.overlayWrapperRight } },
+          left: { title: 'FORK NO', style: { label: styles.overlayLabel, wrapper: styles.overlayWrapperLeft } },
+          right: { title: 'FORK YES', style: { label: styles.overlayLabel, wrapper: styles.overlayWrapperRight } },
         }}
         animateOverlayLabelsOpacity
         verticalSwipe={false} // Keep vertical swipe disabled
@@ -93,12 +93,10 @@ export default function SwipeScreenComponent({ sessionCode, restaurants }: Props
   );
 }
 
-// Styles adjusted for consistency and clarity
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
-    // justifyContent: "center", // Swiper handles positioning, center might conflict
     backgroundColor: '#fafafa', // Ensure background consistency
     paddingTop: 50, // Add some padding at the top
   },
@@ -174,7 +172,8 @@ const styles = StyleSheet.create({
     marginTop: 30,
     marginLeft: -30,
     borderColor: 'red',
-    borderWidth: 2,
+    borderWidth: 4,
+    transform: [{ rotate: '15deg' }]
   },
    overlayWrapperRight: {
     flexDirection: 'column',
@@ -183,6 +182,7 @@ const styles = StyleSheet.create({
     marginTop: 30,
     marginLeft: 30,
      borderColor: 'green',
-     borderWidth: 2,
+     borderWidth: 4,
+     transform: [{ rotate: '-15deg' }]
   },
 });
