@@ -1,7 +1,7 @@
 // session.ts
 import { getDatabase, ref, set, get, child, update, onValue, off } from "firebase/database";
 import { fetchRestaurantsByRadius } from "../services/backend"; // <-- confirm this path
-import { auth } from "../lib/firebaseConfig";
+import { app, auth } from "../lib/firebaseConfig";
 import * as Location from "expo-location";
 
 /** ---- Types ---- */
@@ -159,4 +159,28 @@ export async function seedRestaurantsForSession(
   await update(ref(db, `sessions/${code}`), { status: "ready" });
 
   return rows;
+}
+export async function recordSwipe(
+  code: string,
+  restaurantId: string,
+  liked: boolean
+) {
+  const db = getDatabase();
+  const user = auth.currentUser;
+  if (!user) throw new Error("User not authenticated");
+
+  const swipeRef = ref(
+    db,
+    `sessions/${code}/swipes/${restaurantId}/${user.uid}`
+  );
+
+  await set(swipeRef, liked ? true : null);
+
+  console.log(`Recorded swipe for ${user.uid}: ${restaurantId} -> ${liked}`);
+  console.log(`SWIPE RECORDED:
+      Session: ${code}
+      User: ${user.uid}
+      Restaurant: ${restaurantId}
+      Liked: ${liked}
+    `);
 }
