@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Image } from "react-native";
 import { useAnonymousAuth } from "../src/utils/authHelpers";
 import { joinSession } from "../src/utils/session";
 import { router } from "expo-router";
@@ -21,6 +21,13 @@ export default function JoinSessionScreen() {
 
   return (
     <View style={styles.container}>
+      {/* 👇 Add your logo here */}
+      <Image
+        source={require("../assets/ForkYes_logo.png")} // adjust this path if needed
+        style={styles.logo}
+        resizeMode="contain"
+      />
+
       <Text style={styles.title}>Join a Session</Text>
 
       <TextInput
@@ -61,7 +68,13 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 24,
     justifyContent: "center",
+    alignItems: "center", // centers logo and text
     backgroundColor: "#fff",
+  },
+  logo: {
+    width: 300,
+    height: 160,
+    marginBottom: 30,
   },
   title: {
     fontSize: 22,
@@ -76,6 +89,7 @@ const styles = StyleSheet.create({
     padding: 12,
     fontSize: 16,
     marginBottom: 16,
+    width: "100%",
   },
   buttonBox: {
     borderWidth: 1,
@@ -84,6 +98,7 @@ const styles = StyleSheet.create({
     padding: 16,
     alignItems: "center",
     backgroundColor: "#f9f9f9",
+    width: "100%",
   },
   button: {
     paddingVertical: 12,

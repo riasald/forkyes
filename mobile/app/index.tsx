@@ -1,11 +1,18 @@
 import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
 import { router } from "expo-router";
 
 export default function HomeScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Welcome to ForkYes</Text>
+      {/* Logo Section */}
+      <Image
+        source={require("../assets/ForkYes_logo.png")} // <-- update this path based on where you save your logo
+        style={styles.logo}
+        resizeMode="contain"
+      />
+
+      <Text style={styles.title}>Welcome!</Text>
       <Text style={styles.subtitle}>Choose an option:</Text>
 
       <TouchableOpacity
@@ -33,6 +40,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     padding: 24,
   },
+ logo: {
+  width: 380,   // was 220
+  height: 200,  // was 120
+  marginBottom: 30,
+},
+
   title: {
     fontSize: 28,
     fontWeight: "bold",
