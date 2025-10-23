@@ -7,7 +7,7 @@ export default function HomeScreen() {
     <View style={styles.container}>
       {/* Logo Section */}
       <Image
-        source={require("../assets/ForkYes_logo.png")} // <-- update this path based on where you save your logo
+        source={require("../assets/ForkYes_logo.png")}
         style={styles.logo}
         resizeMode="contain"
       />

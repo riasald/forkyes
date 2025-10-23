@@ -27,7 +27,7 @@ export default function SessionLobbyScreen() {
     }
     console.log("➡️ Navigating to index with code:", code);
     router.replace({
-      pathname: "../(tabs)", // 👈 adjust to your actual route
+      pathname: "/swipe",
       params: { code: String(code) },
     });
   };
