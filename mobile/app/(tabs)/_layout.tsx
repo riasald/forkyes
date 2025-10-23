@@ -44,12 +44,6 @@ export default function TabLayout() {
           title: "Swipe",
         }}
       />
-    <Tabs.Screen
-      name="likes"
-      options={{
-        title: "Likes",
-      }}
-    />
       <Tabs.Screen
         name="matches"
         options={{
