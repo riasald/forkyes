@@ -105,7 +105,7 @@ export default function HomeTab() {
           Missing session code.
         </Text>
         <View style={{ marginTop: 20 }}>
-          <Button title="Back to Home" onPress={() => router.push("/")} />
+          <Button title="Back to Home" onPress={() => router.replace("/")} />
         </View>
       </Centered>
     );

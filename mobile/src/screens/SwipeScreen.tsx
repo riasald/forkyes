@@ -5,11 +5,10 @@ import { recordSwipe } from "../utils/session"; // Assuming this function exists
 
 const { width } = Dimensions.get("window");
 
-// Consistent Restaurant Interface (consider moving to types.ts)
 interface Restaurant {
   id: string;
   name: string;
-  image: string; // Ensure this is always provided if SwipeScreen uses it
+  image: string;
   address: string;
 }
 
@@ -21,10 +20,8 @@ interface Props {
 export default function SwipeScreenComponent({ sessionCode, restaurants }: Props) {
   const [cardIndex, setCardIndex] = useState(0);
 
-  // Use the correct type for index (number)
   const handleSwipe = async (index: number, direction: 'left' | 'right') => {
     const restaurant = restaurants[index];
-    // Ensure restaurant exists before proceeding
     if (!restaurant) {
       console.warn(`Swiped on invalid index: ${index}`);
       return;
@@ -34,10 +31,7 @@ export default function SwipeScreenComponent({ sessionCode, restaurants }: Props
       await recordSwipe(sessionCode, restaurant.id, liked);
     } catch (error) {
       console.error("Failed to record swipe:", error);
-      // Optional: Add user feedback here if recording fails
     }
-    // No need to manually setCardIndex, Swiper handles advancing the index internally
-    // setCardIndex(index + 1); // Remove this line
   };
 
   const handleSwipedAll = () => {
@@ -55,7 +49,6 @@ export default function SwipeScreenComponent({ sessionCode, restaurants }: Props
         // Use the correct type for the card data
         renderCard={(restaurant: Restaurant | undefined) => {
           if (!restaurant) {
-            // This view is shown when cards run out
             return (
               <View style={[styles.card, styles.doneCard]}>
                 <Text style={styles.doneText}>All restaurants swiped!</Text>

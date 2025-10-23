@@ -1,10 +1,9 @@
 // session.ts
 import { getDatabase, ref, set, get, child, update, onValue, off } from "firebase/database";
-import { fetchRestaurantsByRadius } from "../services/backend"; // <-- confirm this path
+import { fetchRestaurantsByRadius } from "../services/backend";
 import { app, auth } from "../lib/firebaseConfig";
 import * as Location from "expo-location";
 
-/** ---- Types ---- */
 export type SessionDoc = {
   code: string;
   createdAt: number;
@@ -14,7 +13,6 @@ export type SessionDoc = {
   maxRestaurants: number;
 };
 
-/** Generate a 6-char uppercase code, e.g. “F7Q2MX” */
 export function generateCode(length = 6): string {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // skip confusing chars
   let out = "";
@@ -22,7 +20,6 @@ export function generateCode(length = 6): string {
   return out;
 }
 
-/** Create a unique session code by checking RTDB; a few retries just in case */
 async function createUniqueCode(db: ReturnType<typeof getDatabase>, retries = 5): Promise<string> {
   for (let i = 0; i < retries; i++) {
     const code = generateCode();
@@ -91,14 +88,12 @@ export async function joinSession(code: string, name: string) {
   return trimmed;
 }
 
-/** Read the whole session once */
 export async function getSession(code: string): Promise<SessionDoc | null> {
   const db = getDatabase();
   const snap = await get(child(ref(db), `sessions/${code}`));
   return (snap.val() as SessionDoc) ?? null;
 }
 
-/** Subscribe to the participants list; returns unsubscribe function */
 export function subscribeParticipants(
   code: string,
   cb: (list: { uid: string; name: string }[]) => void
@@ -114,7 +109,6 @@ export function subscribeParticipants(
   return () => off(participantsRef, "value", handler);
 }
 
-/** Subscribe to the shared restaurants list for this session */
 export function subscribeRestaurants(
   code: string,
   cb: (rows: { name: string; address: string }[]) => void
@@ -126,13 +120,6 @@ export function subscribeRestaurants(
   return () => off(rRef, "value", handler);
 }
 
-/**
- * Seed restaurants:
- *  - reads session.location & maxRestaurants
- *  - calls backend (Geoapify under the hood)
- *  - writes results to /sessions/{code}/restaurants
- *  - flips status to 'ready'
- */
 export async function seedRestaurantsForSession(
   code: string,
   options?: { radiusMeters?: number }
@@ -141,7 +128,6 @@ export async function seedRestaurantsForSession(
   const s = await getSession(code);
   if (!s) throw new Error("Session not found");
 
-  // mark seeding so UI can show a spinner
   await update(ref(db, `sessions/${code}`), { status: "seeding" });
 
   const radius = options?.radiusMeters ?? 5000;           // choose your default radius
