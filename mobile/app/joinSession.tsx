@@ -1,5 +1,15 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Image } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+  Image,
+  Keyboard,
+  TouchableWithoutFeedback,
+} from "react-native";
 import { useAnonymousAuth } from "../src/utils/authHelpers";
 import { joinSession } from "../src/utils/session";
 import { router } from "expo-router";
@@ -20,46 +30,49 @@ export default function JoinSessionScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      {/* 👇 Add your logo here */}
-      <Image
-        source={require("../assets/ForkYes_logo.png")} // adjust this path if needed
-        style={styles.logo}
-        resizeMode="contain"
-      />
+    // 👇 Wrap entire view in TouchableWithoutFeedback
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <View style={styles.container}>
+        {/* Logo */}
+        <Image
+          source={require("../assets/ForkYes_logo.png")} // adjust path if needed
+          style={styles.logo}
+          resizeMode="contain"
+        />
 
-      <Text style={styles.title}>Join a Session</Text>
+        <Text style={styles.title}>Join a Session</Text>
 
-      <TextInput
-        placeholder="Your name (optional)"
-        placeholderTextColor="#888"
-        value={name}
-        onChangeText={setName}
-        style={styles.input}
-      />
+        <TextInput
+          placeholder="Your name (optional)"
+          placeholderTextColor="#888"
+          value={name}
+          onChangeText={setName}
+          style={styles.input}
+        />
 
-      <TextInput
-        placeholder="Session code (e.g. ABC123)"
-        placeholderTextColor="#888"
-        value={code}
-        onChangeText={setCode}
-        autoCapitalize="characters"
-        style={styles.input}
-      />
+        <TextInput
+          placeholder="Session code (e.g. ABC123)"
+          placeholderTextColor="#888"
+          value={code}
+          onChangeText={setCode}
+          autoCapitalize="characters"
+          style={styles.input}
+        />
 
-      <View style={styles.buttonBox}>
-        <TouchableOpacity style={[styles.button, styles.joinButton]} onPress={onJoin}>
-          <Text style={styles.buttonText}>Join</Text>
-        </TouchableOpacity>
+        <View style={styles.buttonBox}>
+          <TouchableOpacity style={[styles.button, styles.joinButton]} onPress={onJoin}>
+            <Text style={styles.buttonText}>Join</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          style={[styles.button, styles.backButton]}
-          onPress={() => router.push("/")}
-        >
-          <Text style={styles.buttonText}>Back</Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.button, styles.backButton]}
+            onPress={() => router.push("/")}
+          >
+            <Text style={styles.buttonText}>Back</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+    </TouchableWithoutFeedback>
   );
 }
 

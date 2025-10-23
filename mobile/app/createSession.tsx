@@ -1,5 +1,15 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Image } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+  Image,
+  Keyboard,
+  TouchableWithoutFeedback,
+} from "react-native";
 import { useAnonymousAuth } from "../src/utils/authHelpers";
 import { createSession } from "../src/utils/session";
 import { router } from "expo-router";
@@ -19,37 +29,40 @@ export default function CreateSessionScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      {/* 👇 Add your logo here */}
-      <Image
-        source={require("../assets/ForkYes_logo.png")} // adjust path if needed
-        style={styles.logo}
-        resizeMode="contain"
-      />
+    // 👇 Wrap everything in TouchableWithoutFeedback
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <View style={styles.container}>
+        {/* Logo */}
+        <Image
+          source={require("../assets/ForkYes_logo.png")}
+          style={styles.logo}
+          resizeMode="contain"
+        />
 
-      <Text style={styles.title}>Create a Session</Text>
+        <Text style={styles.title}>Create a Session</Text>
 
-      <TextInput
-        placeholder="Your name (optional)"
-        value={name}
-        onChangeText={setName}
-        style={styles.input}
-        placeholderTextColor="#888"
-      />
+        <TextInput
+          placeholder="Your name (optional)"
+          value={name}
+          onChangeText={setName}
+          style={styles.input}
+          placeholderTextColor="#888"
+        />
 
-      <View style={styles.buttonBox}>
-        <TouchableOpacity style={[styles.button, styles.createButton]} onPress={onCreate}>
-          <Text style={styles.buttonText}>Create</Text>
-        </TouchableOpacity>
+        <View style={styles.buttonBox}>
+          <TouchableOpacity style={[styles.button, styles.createButton]} onPress={onCreate}>
+            <Text style={styles.buttonText}>Create</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          style={[styles.button, styles.backButton]}
-          onPress={() => router.push("/")}
-        >
-          <Text style={styles.buttonText}>Back</Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.button, styles.backButton]}
+            onPress={() => router.push("/")}
+          >
+            <Text style={styles.buttonText}>Back</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+    </TouchableWithoutFeedback>
   );
 }
 
@@ -58,7 +71,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 24,
     justifyContent: "center",
-    alignItems: "center", // center the logo and text
+    alignItems: "center",
     backgroundColor: "#fff",
   },
   logo: {
