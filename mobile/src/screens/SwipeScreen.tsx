@@ -3,7 +3,8 @@
 import Swiper from "react-native-deck-swiper"
 import { useState } from "react"
 import { View, Text, Image, StyleSheet, Dimensions } from "react-native"
-import { recordSwipe } from "../utils/session" // Assuming this function exists
+import { recordSwipe, createStableId } from "../utils/session"
+import { getRestaurantImageByName } from "../../assets/restaurantImages"
 
 const { width } = Dimensions.get("window")
 
@@ -31,7 +32,7 @@ export default function SwipeScreenComponent({ sessionCode, restaurants }: Props
     const liked = direction === "right"
 
     console.log(`[v0] Handling swipe:`, {
-      restaurantId: restaurant.id,
+      restaurantId: createStableId(restaurant),
       restaurantName: restaurant.name,
       direction,
       liked,
@@ -69,9 +70,17 @@ export default function SwipeScreenComponent({ sessionCode, restaurants }: Props
               </View>
             )
           }
+
+          const localImg = getRestaurantImageByName(restaurant.name)
+          const imageSource = localImg
+            ? localImg
+            : restaurant.image
+              ? { uri: restaurant.image }
+              : { uri: `https://picsum.photos/seed/${encodeURIComponent(restaurant.name)}/1200/800` }
+
           return (
             <View style={styles.card}>
-              <Image source={{ uri: restaurant.image }} style={styles.image} resizeMode="cover" />
+              <Image source={imageSource} style={styles.image} resizeMode="cover" />
               <View style={styles.textContainer}>
                 <Text style={styles.name}>{restaurant.name}</Text>
                 <Text style={styles.address}>{restaurant.address}</Text>

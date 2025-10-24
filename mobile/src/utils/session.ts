@@ -19,6 +19,12 @@ export type RestaurantRow = {
   photoUrl?: string
 }
 
+export const createStableId = (item: RestaurantRow) => {
+  const combined = (item.name || "") + (item.address || "")
+  if (!combined) return Math.random().toString() // Fallback for bad data
+  return combined.replace(/[^a-zA-Z0-9]/g, "")
+}
+
 export function generateCode(length = 6): string {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789" // skip confusing chars
   let out = ""
@@ -115,9 +121,25 @@ export function subscribeParticipants(code: string, cb: (list: { uid: string; na
 export function subscribeRestaurants(code: string, cb: (rows: RestaurantRow[]) => void) {
   const db = getDatabase()
   const rRef = ref(db, `sessions/${code}/restaurants`)
-  const handler = (snap: any) => cb((snap.val() as RestaurantRow[]) ?? [])
+  console.log(`[v0] subscribeRestaurants - Subscribing to path: sessions/${code}/restaurants`)
+  const handler = (snap: any) => {
+    const rawValue = snap.val()
+    console.log(`[v0] subscribeRestaurants - Firebase snapshot received:`, {
+      exists: snap.exists(),
+      isArray: Array.isArray(rawValue),
+      length: Array.isArray(rawValue) ? rawValue.length : 0,
+      type: typeof rawValue,
+      path: snap.ref.toString(),
+    })
+    const restaurants = (rawValue as RestaurantRow[]) ?? []
+    console.log(`[v0] subscribeRestaurants - Returning ${restaurants.length} restaurants to callback`)
+    cb(restaurants)
+  }
   onValue(rRef, handler)
-  return () => off(rRef, "value", handler)
+  return () => {
+    console.log(`[v0] subscribeRestaurants - Unsubscribing from sessions/${code}/restaurants`)
+    off(rRef, "value", handler)
+  }
 }
 
 export async function seedRestaurantsForSession(code: string, options?: { radiusMeters?: number }) {

@@ -3,19 +3,15 @@
 import { useEffect, useState } from "react"
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Linking, Image } from "react-native"
 import { useLocalSearchParams } from "expo-router"
-import { subscribeRestaurants, type RestaurantRow } from "../../src/utils/session"
+import { subscribeRestaurants, type RestaurantRow, createStableId } from "../../src/utils/session"
 import { subscribeMatches } from "../../src/utils/matchLogic"
+import { getRestaurantImageByName } from "../../assets/restaurantImages"
 
 interface Restaurant {
   id: string
   name: string
   image: string
   address: string
-}
-
-const createStableId = (item: RestaurantRow) => {
-  const combined = item.name + item.address
-  return combined.replace(/[^a-zA-Z0-9]/g, "")
 }
 
 export default function MatchScreen() {
@@ -28,12 +24,18 @@ export default function MatchScreen() {
     if (!code) return
 
     const unsubscribe = subscribeRestaurants(code, (list: RestaurantRow[]) => {
+      console.log("[v0] Matches - Raw restaurants received from Firebase:", list.length)
       const formattedList: Restaurant[] = list.map((item) => ({
         id: createStableId(item),
         name: item.name,
         address: item.address,
         image: item.photoUrl || `https://picsum.photos/seed/${encodeURIComponent(item.name)}/1200/800`,
       }))
+      console.log("[v0] Matches - Formatted restaurants:", formattedList.length)
+      console.log(
+        "[v0] Matches - Sample restaurant IDs:",
+        formattedList.slice(0, 3).map((r) => r.id),
+      )
       setRestaurants(formattedList)
     })
 
@@ -44,6 +46,8 @@ export default function MatchScreen() {
     if (!code) return
 
     const unsubscribe = subscribeMatches(code, (ids) => {
+      console.log("[v0] Matches - Raw matched IDs received from Firebase:", ids.length)
+      console.log("[v0] Matches - Matched IDs:", ids)
       setMatchedIds(ids)
     })
 
@@ -51,7 +55,33 @@ export default function MatchScreen() {
   }, [code])
 
   useEffect(() => {
-    const matched = restaurants.filter((r) => matchedIds.includes(r.id))
+    console.log(
+      "[v0] Matches - Filtering: restaurants.length =",
+      restaurants.length,
+      "matchedIds.length =",
+      matchedIds.length,
+    )
+
+    if (restaurants.length === 0 || matchedIds.length === 0) {
+      console.log("[v0] Matches - Skipping filter: restaurants or matchedIds is empty")
+      setMatchedRestaurants([])
+      return
+    }
+
+    const matched = restaurants.filter((r) => {
+      const isMatched = matchedIds.includes(r.id)
+      if (isMatched) {
+        console.log("[v0] Matches - Found match:", r.name, "with ID:", r.id)
+      }
+      return isMatched
+    })
+
+    console.log("[v0] Matches - Filtered matched restaurants:", matched.length)
+    console.log(
+      "[v0] Matches - All restaurant IDs:",
+      restaurants.map((r) => r.id),
+    )
+    console.log("[v0] Matches - All matched IDs:", matchedIds)
     setMatchedRestaurants(matched)
   }, [restaurants, matchedIds])
 
@@ -67,34 +97,46 @@ export default function MatchScreen() {
         <Text style={styles.emptyEmoji}>🍽️</Text>
         <Text style={styles.emptyTitle}>No Matches Yet!</Text>
         <Text style={styles.emptySubtitle}>Keep swiping to find restaurants everyone agrees on</Text>
+        <Text style={styles.debugText}>
+          Restaurants loaded: {restaurants.length} | Matches: {matchedIds.length}
+        </Text>
       </View>
     )
   }
 
-  return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Your Matches</Text>
-      <FlatList
-        data={matchedRestaurants}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.listContent}
-        renderItem={({ item }) => (
-          <TouchableOpacity style={styles.card} onPress={() => openInMaps(item.address)} activeOpacity={0.7}>
-            <Image source={{ uri: item.image }} style={styles.image} resizeMode="cover" />
-            <View style={styles.cardContent}>
-              <View style={styles.textContainer}>
-                <Text style={styles.name}>{item.name}</Text>
-                <Text style={styles.address}>{item.address}</Text>
-              </View>
-              <View style={styles.iconContainer}>
-                <Text style={styles.icon}>📍</Text>
-              </View>
-            </View>
-          </TouchableOpacity>
-        )}
-      />
-    </View>
-  )
+  // return (
+  //   <View style={styles.container}>
+  //     <Text style={styles.header}>Your Matches</Text>
+  //     <FlatList
+  //       data={matchedRestaurants}
+  //       keyExtractor={(item) => item.id}
+  //       contentContainerStyle={styles.listContent}
+  //       renderItem={({ item }) => {
+  //         const localImg = getRestaurantImageByName(item.name)
+  //         const imageSource = localImg
+  //           ? localImg
+  //           : item.image
+  //             ? { uri: item.image }
+  //             : { uri: `https://picsum.photos/seed/${encodeURIComponent(item.name)}/1200/800` }
+
+  //         return (
+  //           <TouchableOpacity style={styles.card} onPress={() => openInMaps(item.address)} activeOpacity={0.7}>
+  //             <Image source={imageSource} style={styles.image} resizeMode="cover" />
+  //             <View style={styles.cardContent}>
+  //               <View style={styles.textContainer}>
+  //                 <Text style={styles.name}>{item.name}</Text>
+  //                 <Text style={styles.address}>{item.address}</Text>
+  //               </View>
+  //               <View style={styles.iconContainer}>
+  //                 <Text style={styles.icon}>📍</Text>
+  //               </View>
+  //             </View>
+  //           </TouchableOpacity>
+  //         )
+  //       }}
+  //     />
+  //   </View>
+  // )
 }
 
 const styles = StyleSheet.create({
@@ -177,5 +219,11 @@ const styles = StyleSheet.create({
     color: "#666",
     textAlign: "center",
     lineHeight: 24,
+  },
+  debugText: {
+    fontSize: 12,
+    color: "#999",
+    marginTop: 20,
+    textAlign: "center",
   },
 })
