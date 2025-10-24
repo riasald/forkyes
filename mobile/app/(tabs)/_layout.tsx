@@ -1,4 +1,5 @@
-import { Tabs, router } from "expo-router";
+// 1. Import Stack instead of Tabs
+import { Stack, router } from "expo-router"; 
 import React from "react";
 import {
   TouchableOpacity,
@@ -32,25 +33,31 @@ function HeaderLogo() {
 
 export default function TabLayout() {
   return (
-    <Tabs
+    // 2. Change Tabs to Stack
+    <Stack
       screenOptions={{
         headerTitle: () => <HeaderLogo />,
         headerRight: () => <ExitButton />,
       }}
     >
-      <Tabs.Screen
+      {/* 3. Change Tabs.Screen to Stack.Screen */}
+      <Stack.Screen
         name="swipe"
         options={{
           title: "Swipe",
         }}
       />
-      <Tabs.Screen
-        name="matches"
-        options={{
-          title: "Matches",
-        }}
-      />
-    </Tabs>
+       
+       {/* Your matches.tsx file still exists, 
+           but it's no longer a tab. If you want to be
+           able to navigate to it (e.g., from a button),
+           you can add it back here like this:
+           
+           <Stack.Screen name="matches" />
+       */}
+       
+    {/* 4. Change closing tag to Stack */}
+    </Stack> 
   );
 }
 

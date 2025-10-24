@@ -13,6 +13,7 @@ import {
 } from "../../src/utils/session"
 import SwipeScreenComponent from "../../src/screens/SwipeScreen"
 import { watchForMatches } from "../../src/utils/matchLogic"
+import { getRestaurantImageByName } from "../../assets/restaurantImages"
 
 // This is the interface your swiper component expects
 interface Restaurant {
@@ -61,14 +62,21 @@ export default function HomeTab() {
     }
 
     const unsub = subscribeRestaurants(code, (list: RestaurantRow[]) => {
-      const formattedList: Restaurant[] = list.map((item) => ({
-        id: createStableId(item),
+      const formattedList: Restaurant[] = list.map((item) => {
+        const localImg = getRestaurantImageByName(item.name)
+        const imageSource = localImg
+          ? localImg
+          : item.photoUrl
+            ? { uri: item.photoUrl }
+            : { uri: `https://picsum.photos/seed/${encodeURIComponent(item.name)}/1200/800` }
 
-        name: item.name,
-        address: item.address,
-
-        image: item.photoUrl || `https://picsum.photos/seed/${encodeURIComponent(item.name)}/1200/800`,
-      }))
+        return {
+          id: createStableId(item),
+          name: item.name,
+          address: item.address,
+          image: typeof imageSource === "number" ? "" : imageSource.uri || "",
+        }
+      })
 
       setRestaurants(formattedList)
       setLoading(false)
